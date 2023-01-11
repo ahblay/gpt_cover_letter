@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-  <title>OpenAI Quickstart</title>
+  <title>GPT Cover Letter</title>
   <link
     rel="shortcut icon"
     href="{{ url_for('static', filename='dog.png') }}"
@@ -9,13 +9,28 @@
 </head>
 
 <body>
-  <img src="{{ url_for('static', filename='dog.png') }}" class="icon" />
-  <h3>Name my pet</h3>
+  <h2 class="title">Build My Cover Letter</h2>
   <form action="/" method="post">
-    <input type="text" name="animal" placeholder="Enter an animal" required />
-    <input type="submit" value="Generate names" />
+    <div class="container-left">
+      <input type="text" name="recipient" placeholder="Recipient">
+      <br>
+      <input type="text" name="company" placeholder="Company">
+      <br>
+      <input type="text" name="address" placeholder="Street address">
+      <br>
+      <input type="text" name="city" placeholder="City and ZIP">
+    </div>
+    <textarea type="text" name="cover" placeholder="Enter cover letter" required></textarea>
+    <textarea type="text" name="job" placeholder="Enter job description" required></textarea>
+    <input type="submit" value="Generate cover letter" />
   </form>
-  {% if result %}
-  <div class="result">{{ result }}</div>
+  <form action="/generate_latex" method="post">
+    {% if result %}
+    <textarea class="result" name="completion">{{ result }}</textarea>
+    {% endif %}
+    <input type="submit" value="Generate latex" />
+  </form>
+  {% if pdf_filepath %}
+  <a class="button" href="{{ pdf_filepath }}">Result</a>
   {% endif %}
 </body>
