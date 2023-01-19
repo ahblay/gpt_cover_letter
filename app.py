@@ -6,57 +6,95 @@ from build_latex import make_document
 app = Flask(__name__)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-business_info = [
-            'Hiring Manager',
-            'Company',
-            'Street Address',
-            'City and ZIP'
-        ]
 
+def merge_lists(a, b):
+    result = []
+    for pair in zip(a, b):
+        if pair[0].strip() == "":
+            result.append(pair[1])
+        else:
+            result.append(pair[0])
+    return result
 
 @app.route("/", methods=("GET", "POST"))
 def index():
-    global business_info
+    print("Redirected")
+    print(request.args)
+    print(request.args.getlist('personal_info'))
     if request.method == "POST":
         cover = request.form["cover"]
         job = request.form["job"]
-        business_info = [
-            request.form["recipient"],
-            request.form["company"],
-            request.form["address"],
-            request.form["city"]
-        ]
         allowable_response_length = 4096 - len(cover)/4 - len(job)/4
-        print(allowable_response_length)
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=generate_prompt(cover, job),
             temperature= 0.9,
             max_tokens=int(allowable_response_length),
         )
-        print(response.choices)
-        print(response.choices[0])
-        return redirect(url_for("index", result=response.choices[0].text.strip('Dear Hiring Manager')))
 
-    result = request.args.get("result")
-    return render_template("index.html", result=result)
+        submitted = True
+        result = response.choices[0].text.strip('Dear Hiring Manager')
+        #print(result)
+        return redirect(url_for("index",
+                                result=result,
+                                submitted=submitted,
+                                cover=cover,
+                                job=job
+                        ))
+    print("rendering template...")
+    return render_template("index.html",
+                           submitted=request.args.get("submitted"),
+                           result=request.args.get("result"),
+                           business=request.args.getlist("business_info"),
+                           personal=request.args.getlist("personal_info"),
+                           cover=request.args.get("cover"),
+                           job=request.args.get("job"),
+                           pdf_filepath=request.args.get("pdf_filepath"))
 
 @app.route("/generate_latex", methods=("GET", "POST"))
 def generate_latex():
     if request.method == "POST":
-        completion = request.form["completion"]
+        print("POST")
         personal_info = [
-            '1525 Griffith Park Blvd, Apt. 107',
-            'Los Angeles, CA 90026',
-            '(707) 913-7014',
-            'abel.e.romer@gmail.com',
-            'https://www.abelromer.com'
+            'Name',
+            'Street Address',
+            'City and ZIP',
+            'Phone',
+            'Email',
+            'Website'
         ]
-        global business_info
-        print(completion)
+        business_info = [
+            'Hiring Manager',
+            'Company',
+            'Street Address',
+            'City and ZIP'
+        ]
+        print("Still in generate_latex...")
+        data = request.get_json()
+        print("DATA POSTED")
+
+        business_info_form = data["business_info"]
+        personal_info_form = data["personal_info"]
+        business_info = merge_lists(business_info_form, business_info)
+        personal_info = merge_lists(personal_info_form, personal_info)
+        completion = data["completion"]
+        job = data["job"]
+        cover = data["cover"]
+
         make_document(personal_info, business_info, completion)
-        path = '/static/cover.pdf'
-    return render_template("index.html", pdf_filepath=path)
+        pdf_filepath = '/static/cover.pdf'
+        submitted = True
+        print(personal_info)
+        return redirect(url_for("index",
+                                submitted=submitted,
+                                result=completion,
+                                personal_info=personal_info,
+                                business_info=business_info,
+                                job=job,
+                                cover=cover,
+                                pdf_filepath=pdf_filepath))
+    print("NOT POST")
+    return redirect(url_for("index"))
 
 
 def generate_prompt(cover, job):

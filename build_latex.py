@@ -11,7 +11,7 @@ def make_document(personal_info, business_info, content):
     class Letter(Environment):
         packages = []
 
-    street, city, phone, email, website = personal_info
+    name, street, city, phone, email, website = personal_info
     recipient, company, business_street, city_zip = business_info
 
     doc = Document(documentclass="letter")
@@ -22,7 +22,7 @@ def make_document(personal_info, business_info, content):
         doc.append(Command('closing', 'Sincerely,'))
         doc.append(Command('encl', 'Resume'))
 
-    doc.preamble.append(Command('signature', 'Abel Romer'))
+    doc.preamble.append(Command('signature', NoEscape(rf'{name}')))
     doc.preamble.append(Command('address', NoEscape(rf'{street} \\ {city} \\ {phone} \\ {teletype(email)} \\ {teletype(website)}')))
 
     doc.packages.append(Package('geometry',

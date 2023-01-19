@@ -1,5 +1,7 @@
 venv/
 
+\latex*
+
 .idea/
 
 *.pyc

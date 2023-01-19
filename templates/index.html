@@ -11,26 +11,88 @@
 <body>
   <h2 class="title">Build My Cover Letter</h2>
   <form action="/" method="post">
-    <div class="container-left">
-      <input type="text" name="recipient" placeholder="Recipient">
-      <br>
-      <input type="text" name="company" placeholder="Company">
-      <br>
-      <input type="text" name="address" placeholder="Street address">
-      <br>
-      <input type="text" name="city" placeholder="City and ZIP">
+    <div class="header-block">
+      <h5 class="sm-title title-left">Cover Letter</h5>
+      <h5 class="sm-title title-right">Job Description</h5>
     </div>
-    <textarea type="text" name="cover" placeholder="Enter cover letter" required></textarea>
-    <textarea type="text" name="job" placeholder="Enter job description" required></textarea>
+    {% if submitted %}
+    <textarea type="text" name="cover" placeholder="Enter cover letter" id="cover" required>{{ cover }}</textarea>
+    <textarea type="text" name="job" placeholder="Enter job description" class="title-right" id="job" required>{{ job }}</textarea>
+    {% else %}
+    <textarea type="text" name="cover" placeholder="Enter cover letter" id="cover" required></textarea>
+    <textarea type="text" name="job" placeholder="Enter job description" class="title-right" id="job" required></textarea>
+    {% endif %}
     <input type="submit" value="Generate cover letter" />
   </form>
-  <form action="/generate_latex" method="post">
+
+  <form>
     {% if result %}
-    <textarea class="result" name="completion">{{ result }}</textarea>
+    <textarea class="result" name="completion" id="completion">{{ result }}</textarea>
     {% endif %}
-    <input type="submit" value="Generate latex" />
+    <div class="header-block">
+      <h5 class="sm-title title-left">Personal Info</h5>
+      <h5 class="sm-title title-right">Business Info</h5>
+    </div>
+    {% if submitted %}
+    <div class="container left">
+      <input type="text" value="{{ personal[0] }}" name="my-name" id="my-name" placeholder="Your name">
+      <br>
+      <input type="text" value="{{ personal[1] }}" name="my-address" id="my-address" placeholder="Your address">
+      <br>
+      <input type="text" value="{{ personal[2] }}" name="my-city" id="my-city" placeholder="Your city">
+    </div>
+    <div class="container">
+      <input type="text" value="{{ personal[3] }}" name="my-phone" id="my-phone" placeholder="Your phone">
+      <br>
+      <input type="text" value="{{ personal[4] }}" name="my-email" id="my-email" placeholder="Your email">
+      <br>
+      <input type="text" value="{{ personal[5] }}" name="my-website" id="my-website" placeholder="Your website">
+    </div>
+    <div class="container-right right">
+      <input type="text" value="{{ business[0] }}" name="recipient" id="recipient" placeholder="Recipient">
+      <br>
+      <input type="text" value="{{ business[1] }}" name="company" id="company" placeholder="Company">
+    </div>
+    <div class="container-right">
+      <input type="text" value="{{ business[2] }}" name="address" id="address" placeholder="Street address">
+      <br>
+      <input type="text" value="{{ business[3] }}" name="city" id="city" placeholder="City and ZIP">
+    </div>
+    {% else %}
+    <div class="container left">
+      <input type="text" name="my-name" id="my-name" placeholder="Your name">
+      <br>
+      <input type="text" name="my-address" id="my-address" placeholder="Your address">
+      <br>
+      <input type="text" name="my-city" id="my-city" placeholder="Your city">
+    </div>
+    <div class="container">
+      <input type="text" name="my-phone" id="my-phone" placeholder="Your phone">
+      <br>
+      <input type="text" name="my-email" id="my-email" placeholder="Your email">
+      <br>
+      <input type="text" name="my-website" id="my-website" placeholder="Your website">
+    </div>
+    <div class="container-right right">
+      <input type="text" name="recipient" id="recipient" placeholder="Recipient">
+      <br>
+      <input type="text" name="company" id="company" placeholder="Company">
+    </div>
+    <div class="container-right">
+      <input type="text" name="address" id="address" placeholder="Street address">
+      <br>
+      <input type="text" name="city" id="city" placeholder="City and ZIP">
+    </div>
+    {% endif %}
+    <input id="generate-latex" type="submit" value="Generate latex" />
   </form>
   {% if pdf_filepath %}
   <a class="button" href="{{ pdf_filepath }}">Result</a>
   {% endif %}
+
+  <script
+  src="https://code.jquery.com/jquery-3.6.3.min.js"
+  integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+  crossorigin="anonymous"></script>
+  <script src="static/index.js"></script>
 </body>
